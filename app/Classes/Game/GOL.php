@@ -7,13 +7,8 @@
 		public $y ;
 
 		public function __construct($xInput, $yInput) {
-			if (!empty($xInput) && !empty($yInput)) {
 				$this->x = $xInput;
 				$this->y = $yInput;
-			} else {
-				$this->x = 0;
-				$this->y = 0;
-			}
 		}
 
 		public function setPosition($xInput, $yInput) {
@@ -75,8 +70,12 @@
 		}
 
 		public function incScore($teamNum) {
-		    if ($this->teamNumber >= $teamNum) {
-                $this->teams[$teamNum-1]->score++;
+            if ($teamNum > 0) {
+    		    if ($this->teamNumber >= $teamNum) {
+                    $this->teams[$teamNum-1]->score++;
+                }
+            } else {
+                echo $this->position->x." ".$this->position->y;
             }
         }
 
@@ -138,12 +137,11 @@
             $this->sizeX = $sX;
             $this->sizeY = $sY;
             $this->points = array();
-            //$pos = new Position(0, 0);
             for ( $i = 0; $i < $this->sizeY ; $i++) {
                 $helpArray = array();
                 for ( $j = 0; $j < $this->sizeX ; $j++) {
                     $point = new Point();
-                    $point->setPoint($j, $i, $this->teamNumber); //Changed it here
+                    $point->setPoint($j, $i, $this->teamNumber);
                     array_push($helpArray, $point);
                 }
                 array_push($this->points, $helpArray);
@@ -176,7 +174,7 @@
                             if ($helpElement !== 0) {
                                 array_push($alivePointsArray, $j);
                                 array_push($alivePointsArray, $i);
-                                array_push($alivePointsArray,  $helpElement);
+                                array_push($alivePointsArray, $helpElement);
                                 $number++;
                             }
                         } elseif ($helpElement[1] == "-") $this->points[$i][$j]->zeroPoint(-1);
@@ -209,14 +207,14 @@
             $x = $pos->x;
             $y = $pos->y;
             $t = $this->points[$y][$x]->team;
-            if ($x === 0) $xM1 = $this->sizeX - 1;
-            else    $xM1 = $x - 1;
-            if ($x === $this->sizeX - 1) $xP1 = 0;
-            else    $xP1 = $x + 1;
-             if ($y === 0) $yM1 = $this->sizeY - 1;
-             else    $yM1 = $y - 1;
-            if ($y === $this->sizeY - 1) $yP1 = 0;
-            else    $yP1 = $y + 1;
+            $xM1 = $x - 1;
+            if ($xM1 === -1) $xM1 = $this->sizeX - 1;
+            $xP1 = $x + 1;
+            if ($xP1 === $this->sizeX) $xP1 = 0;
+            $yM1 = $y - 1;
+            if ($yM1 === -1) $yM1 = $this->sizeY - 1;
+            $yP1 = $y + 1;
+            if ($yP1 === $this->sizeY) $yP1 = 0;
             $this->points[$yM1][$xM1]->incScore($t);
             if (! $this->points[$yM1][$xM1]->add_q()) $this->addPoint($xM1, $yM1);
             $this->points[$yM1][$x]->incScore($t);
@@ -316,8 +314,6 @@
         public function step() {
             $this->culcPoints();
 
-            //$this->show();
-
             while (! empty($this->checkPoints)) {
                 $pos = array_shift($this->checkPoints);
                 $this->points[$pos->y][$pos->x]->disadd();
@@ -354,7 +350,6 @@
                 }
             }
             for ($i = 0; $i < $this->teamNumber; $i++) array_push($helpArray, $this->teams[$i]->score);
-            //var_dump($helpArray);
             return $helpArray;
         }
 
@@ -363,7 +358,7 @@
             for ($i = 0; $i < $this->sizeY; $i++) {
                 echo "</ br>";
                 for ($j = 0; $j < $this->sizeX; $j++) {
-                //echo $this->points[$j][$i]->teams[0]->score." ";
+                //echo $this->points[$i][$j]->teams[0]->score." ";
                     echo $this->points[$i][$j]->team." ";
                     //echo $this->points[$j][$i]->zero." ";
                 }
